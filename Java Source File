@@ -1,0 +1,89 @@
+import java.util.Scanner;
+
+public class VariableByteCodeDecoding {
+
+    public static void main(String[] args) {
+
+
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt the user to enter a Variable Byte Code
+        System.out.print("Please enter a Variable byte code: ");
+        String userInput = takeInput(scanner);
+
+        // Reverse the user input string
+        String reverse = reverseString(userInput);
+
+        // Get the length of the user input string
+        int length = userInput.length();
+
+        while(checkVariableByteCode(userInput, reverse, length) == false) {
+            System.out.print("Invalid input. Please insert a Variable byte code: ");
+            userInput = takeInput(scanner);
+            reverse = reverseString(userInput);
+            length = userInput.length();
+        }
+
+        StringBuilder rev = new StringBuilder(reverse);
+
+        // Process the reversed string to remove certain bits
+        for(int i = 0; i < length; i++) {
+            // Special case for position 7 (8th bit, 0-indexed)
+            if(i + 1 == 7) {
+                rev = rev.deleteCharAt(i + 1);
+                i++;
+            }
+            try {
+                // Remove every 8th bit
+                if((i + 1) % 7 == 0) {
+                    rev = rev.deleteCharAt(i + 1);
+                }
+            } catch(StringIndexOutOfBoundsException e) {
+                // Handle potential index out of bounds exception
+            }
+        }
+
+        // Reverse the processed string back
+        String endString = reverseString(rev.toString());
+
+
+        System.out.print("The decimal of " + userInput + " is: " + Integer.parseInt(endString, 2));
+
+        scanner.close();
+    }
+
+    // Method to check if the input is a valid Variable Byte Code
+    private static boolean checkVariableByteCode(String userInput, String reverse, int length) {
+        // Check if the input is 8 bits long and starts with '1'
+        if(length == 8 && userInput.charAt(0) == '1') {
+            return true;
+        }
+
+        // Check for valid length and format in the reversed string
+        for(int i = 1; i <= length; i++) {
+            if((i + 1) % 8 == 0 && i != 0 && length % 8 == 0 && length > 8 && reverse.charAt(7) == '1') {
+                try {
+                    if(reverse.charAt(i) == '0') {
+                        return true;
+                    }
+                } catch(StringIndexOutOfBoundsException e) {
+                    // Handle potential index out of bounds exception
+                }
+            }
+        }
+        return false;
+    }
+
+    // Method to reverse a given string
+    public static String reverseString(String a) {
+        StringBuilder sb = new StringBuilder(a);
+        sb.reverse();
+        return sb.toString();
+    }
+
+    // Method to take input from the user
+    private static String takeInput(Scanner scanner) {
+        String userInput = scanner.nextLine();
+        return userInput;
+    }
+}
